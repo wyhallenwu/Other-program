@@ -5,11 +5,12 @@ using namespace std;
 struct Word{
     string word;
     int frequency;
+    int order;
     Word *next;
     Word *prev;
-    Word():next(NULL),prev(NULL),frequency(0),word("not a word"){}
-    Word(string word_,Word *next_=NULL,Word *prev_=NULL):word(word_),frequency(1),next(next_),prev(prev_){}
-    Word(const Word &wr):word(wr.word),frequency(wr.frequency){next=wr.next;prev=wr.prev;}
+    Word():next(NULL),prev(NULL),frequency(0),order(0),word("not a word"){}
+    Word(string word_,int order_,Word *next_=NULL,Word *prev_=NULL):word(word_),frequency(1),next(next_),prev(prev_),order(order_){}
+    Word(const Word &wr):word(wr.word),frequency(wr.frequency),order(wr.order){next=wr.next;prev=wr.prev;}
     bool operator==(const Word &wr){
         return wr.word==this->word;
     }
@@ -51,10 +52,10 @@ public:
         {
             pguard=pguard->next;
         }
-        Word *p=new Word(str,head,pguard);
+        length++;
+        Word *p=new Word(str,length,head,pguard);
         pguard->next=p;
         head->prev=p;
-        length++;
     }
     void Exchange(const string &str){
         Word *p=head->next;
@@ -64,17 +65,17 @@ public:
                 break;
         }
         Word *pguard=head->next;
-        for (; pguard != head; pguard = pguard->next) {
-            if (pguard->frequency < p->frequency) {
-                p->prev->next=p->next;
-                p->next->prev=p->prev;
-                p->prev=pguard->prev;
-                p->next=pguard;
-                p->prev->next=p;
-                pguard->prev=p;
-                break;
+            for (; pguard != head; pguard = pguard->next) {
+                if ((pguard->frequency==p->frequency&&pguard->prev->order<p->order&&pguard->order>p->order)||(pguard->frequency < p->frequency)) {
+                    p->prev->next=p->next;
+                    p->next->prev=p->prev;
+                    p->prev=pguard->prev;
+                    p->next=pguard;
+                    p->prev->next=p;
+                    pguard->prev=p;
+                    break;
+                }
             }
-        }
     }
     void show()const{
         Word *p=head->next;
@@ -125,7 +126,8 @@ public:
 int main(){
     Link link;
     link.Load("tale.txt");
-    link.Save("out.txt");
+    link.Save("out1.txt");
+    link.show();
     cout<<link.get_length();
     return 0;
 }
